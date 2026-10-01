@@ -1,0 +1,17 @@
+{
+  "name": "vibra-social-app",
+  "version": "2.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "check": "node --check server.js",
+    "smoke": "node tests/smoke_check.cjs",
+    "preflight": "node tests/production_preflight.cjs"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
+  }
+}
