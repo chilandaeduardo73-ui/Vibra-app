@@ -1,12 +1,21 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import pg from "pg";
+
+const { Pool } = pg;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const localFile = path.join(__dirname, "data.json");
+
 let pool = null;
 let dbMode = "local";
 
 function loadLocal() {
   if (!fs.existsSync(localFile)) return {};
+
   try {
     return JSON.parse(fs.readFileSync(localFile, "utf8"));
   } catch {
@@ -25,15 +34,16 @@ async function initDb() {
   }
 
   try {
-    const { Pool } = require("pg");
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: process.env.DATABASE_SSL === "false"
-        ? false
-        : { rejectUnauthorized: false }
+      ssl:
+        process.env.DATABASE_SSL === "false"
+          ? false
+          : { rejectUnauthorized: false }
     });
 
     await pool.query("SELECT 1");
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS vibra_state (
         id INTEGER PRIMARY KEY,
@@ -55,8 +65,10 @@ async function readState() {
     const result = await pool.query(
       "SELECT data FROM vibra_state WHERE id = 1"
     );
+
     return result.rows[0]?.data || {};
   }
+
   return loadLocal();
 }
 
@@ -69,8 +81,10 @@ async function writeState(data) {
        DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()`,
       [data]
     );
+
     return;
   }
+
   saveLocal(data);
 }
 
@@ -81,4 +95,4 @@ function status() {
   };
 }
 
-module.exports = { initDb, readState, writeState, status };
+export { initDb, readState, writeState, status };
