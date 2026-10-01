@@ -1,4 +1,4 @@
-const vibraDB = require('./db');
+import * as vibraDB from './db.js';
 import express from 'express';
 import pg from 'pg';
 const { Pool } = pg;
